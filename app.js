@@ -1,3 +1,6 @@
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 const bodyParser = require("body-parser");
 const express = require("express");
 const flash = require("connect-flash");
@@ -8,8 +11,7 @@ const mongoose = require("mongoose");
 const passport = require("passport");
 
 // database === === ===
-// change the database name, and uncomment
-// mongoose.connect("mongodb://localhost/express_starter");
+mongoose.connect(process.env.DATABASE_URL);
 
 // models
 const User = require("./models/user");
@@ -39,7 +41,8 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 // routes and routers
-const indexRoutes = require("./routes/index");
+const indexRouter = require("./routes/index");
+const userRouter = require("./routes/users");
 
 app.use((req, res, next) => {
   res.locals.user = req.user;
@@ -48,10 +51,10 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/", indexRoutes);
+app.use("/", indexRouter);
+app.use("/users", userRouter);
 
 // start the server
-const PORT = 5000;
-app.listen(process.env.PORT || PORT, process.env.IP, () => {
+app.listen(process.env.PORT || 5000, process.env.IP, () => {
   console.log("Express Server has Started!");
 });
